@@ -1,6 +1,9 @@
 package com.dyusov.news.domain.usecase
 
 import com.dyusov.news.domain.repo.NewsRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AddSubscriptionUseCase @Inject constructor(
@@ -8,6 +11,9 @@ class AddSubscriptionUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(topic: String) {
         newsRepository.addSubscription(topic)
-        newsRepository.updateArticlesForTopic(topic)
+        // same as launch another coroutine in viewmodel
+        CoroutineScope(currentCoroutineContext()).launch {
+            newsRepository.updateArticlesForTopic(topic)
+        }
     }
 }
