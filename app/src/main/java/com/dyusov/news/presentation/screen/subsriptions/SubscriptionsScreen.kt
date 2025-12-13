@@ -1,0 +1,419 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package com.dyusov.news.presentation.screen.subsriptions
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import com.dyusov.news.R
+import com.dyusov.news.domain.entity.Article
+import com.dyusov.news.presentation.theme.ui.CustomIcons
+import com.dyusov.news.presentation.utils.formatDate
+
+@Composable
+fun SubscriptionsScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToSettings: () -> Unit,
+    viewModel: SubscriptionsViewModel = hiltViewModel()
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            SubscriptionsTopBar(
+                onRefreshDataClick = {
+                    viewModel.processCommand(SubscriptionsCommand.RefreshData)
+                },
+                onClearArticlesClick = {
+                    viewModel.processCommand(SubscriptionsCommand.ClearArticles)
+                },
+                onSettingsClick = onNavigateToSettings
+            )
+        }
+    ) { innerPadding ->
+        // use delegate
+        val state by viewModel.state.collectAsState()
+
+        // all content is scrollable, so it will be wrapped in LazyColumn
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            contentPadding = innerPadding,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            item {
+                Subscriptions(
+                    query = state.searchQuery,
+                    subscriptions = state.subscriptions,
+                    isSubscribeButtonEnabled = state.subscribeButtonEnabled,
+                    onTopicClick = { topic ->
+                        viewModel.processCommand(SubscriptionsCommand.ToggleTopicSelection(topic))
+                    },
+                    onQueryChanged = { searchQuery ->
+                        viewModel.processCommand(SubscriptionsCommand.InputTopicSearch(searchQuery))
+                    },
+                    onSubscribeButtonClick = {
+                        viewModel.processCommand(SubscriptionsCommand.Subscribe)
+                    },
+                    onDeleteSubscription = { topic ->
+                        viewModel.processCommand(SubscriptionsCommand.RemoveSubscription(topic))
+                    }
+                )
+            }
+
+            // is articles exist, show divider and label (and if subscriptions is not empty - how special text)
+            if (state.articles.isNotEmpty()) {
+                item {
+                    // add divider
+                    HorizontalDivider()
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.articles, state.articles.size),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                items(
+                    items = state.articles,
+                    key = { it.url }
+                ) {
+                    ArticleCard(article = it)
+                }
+            } else if (state.subscriptions.isNotEmpty()) {
+                item {
+                    // add divider
+                    HorizontalDivider()
+                }
+                item {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.no_articles_for_selected_subscriptions),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SubscriptionsTopBar(
+    modifier: Modifier = Modifier,
+    onRefreshDataClick: () -> Unit,
+    onClearArticlesClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    // experimental function
+    TopAppBar(
+        modifier = modifier,
+        title = {
+            Text(text = stringResource(R.string.subscriptions_title))
+        },
+        // all elements will be in one row
+        actions = {
+            // update articles button
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        onRefreshDataClick()
+                    }
+                    .padding(8.dp),
+                imageVector = Icons.Default.Refresh,
+                contentDescription = stringResource(R.string.update_articles)
+            )
+            // clear articles button
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        onClearArticlesClick()
+                    }
+                    .padding(8.dp),
+                imageVector = Icons.Default.Clear,
+                contentDescription = stringResource(R.string.clear_articles)
+            )
+            // go to settings screen button
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        onSettingsClick()
+                    }
+                    .padding(8.dp),
+                imageVector = Icons.Default.Settings,
+                contentDescription = stringResource(R.string.settings_screen)
+            )
+        }
+    )
+}
+
+@Composable
+private fun SubscriptionChip(
+    modifier: Modifier = Modifier,
+    topic: String,
+    isSelected: Boolean,
+    onSubscriptionClick: (String) -> Unit,
+    onDeleteSubscription: (String) -> Unit
+) {
+    // element that can toggle to be added/removed from some filter
+    FilterChip(
+        modifier = modifier,
+        // whether this item is selected or not
+        selected = isSelected,
+        onClick = {
+            onSubscriptionClick(topic)
+        },
+        label = {
+            Text(topic)
+        },
+        // "remove" icon at the end of the chip
+        trailingIcon = {
+            Icon(
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable {
+                        onDeleteSubscription(topic)
+                    },
+                imageVector = Icons.Default.Clear,
+                contentDescription = stringResource(R.string.remove_subscription)
+            )
+        }
+    )
+}
+
+@Composable
+private fun Subscriptions(
+    modifier: Modifier = Modifier,
+    subscriptions: Map<String, Boolean>,
+    query: String,
+    isSubscribeButtonEnabled: Boolean,
+    onQueryChanged: (String) -> Unit,
+    onTopicClick: (String) -> Unit,
+    onDeleteSubscription: (String) -> Unit,
+    onSubscribeButtonClick: () -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        // search field with hint
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = query,
+            onValueChange = onQueryChanged,
+            label = {
+                Text(stringResource(R.string.what_interests_you))
+            },
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // add subscription button
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onSubscribeButtonClick,
+            enabled = isSubscribeButtonEnabled
+        ) {
+            // add icon
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(R.string.add_subscription)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(R.string.add_subscription_button))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // if there are subscriptions, show them below search field, else - text "No subscriptions"
+        if (subscriptions.isNotEmpty()) {
+            // header
+            Text(
+                // show subscriptions + size
+                text = stringResource(R.string.subscriptions_label, subscriptions.size),
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // row with FilterChip elements
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                subscriptions.forEach { (topic, isSelected) ->
+                    item(key = topic) {
+                        SubscriptionChip(
+                            topic = topic,
+                            isSelected = isSelected,
+                            onSubscriptionClick = onTopicClick,
+                            onDeleteSubscription = onDeleteSubscription
+                        )
+                    }
+                }
+            }
+        } else {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.no_subscriptions),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun ArticleCard(
+    modifier: Modifier = Modifier,
+    article: Article
+) {
+    // card item (with drop shadow)
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        // load image if exists
+        article.imageUrl?.let { imageUrl ->
+            // load image with Coil
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = stringResource(R.string.image_for_article, article.title),
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .heightIn(max = 200.dp) // set max height of image
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // article header
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = article.title,
+            maxLines = 2, // header size = 2 rows max
+            overflow = TextOverflow.Ellipsis, // if overflow, print "..."
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // show article description if exists
+        if (article.description.isNotEmpty()) {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = article.description,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // row with source and published date
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween // space evenly
+        ) {
+            Text(
+                text = article.source,
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 14.sp
+            )
+            Text(
+                text = article.publishedAt.formatDate(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // row with two buttons - open article and share
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp) // space between items is 8 dp
+        ) {
+            // open article button
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {} // todo: temp
+            ) {
+                Icon(
+                    imageVector = CustomIcons.OpenInNew, // use custom icon
+                    contentDescription = stringResource(R.string.read_article)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = stringResource(R.string.read))
+            }
+            // share button
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {} // todo: temp
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = stringResource(R.string.share_article)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = stringResource(R.string.share))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+    }
+}
