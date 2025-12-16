@@ -37,7 +37,7 @@ To build and run this project, you will need an API key from [newsapi.org](https
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/r4geghost/News.git
+    git clone https://github.com/meekieD/News.git
     ```
 2.  Navigate to the project directory.
 3.  Create a file named `keystore.properties` in the root directory of the project.
