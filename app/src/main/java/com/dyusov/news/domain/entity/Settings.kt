@@ -5,7 +5,14 @@ data class Settings(
     val interval: Interval,
     val notificationsEnabled: Boolean,
     val wifiOnly: Boolean
-)
+) {
+    companion object {
+        val DEFAULT_LANGUAGE = Language.ENGLISH
+        val DEFAULT_INTERVAL = Interval.MIN_15
+        const val DEFAULT_NOTIFICATIONS_ENABLED = false
+        const val DEFAULT_WIFI_ONLY = false
+    }
+}
 
 enum class Language {
     ENGLISH, RUSSIAN, FRENCH, GERMAN
@@ -20,4 +27,8 @@ enum class Interval(val minutes: Int) {
     HOUR_8(480),
     HOUR_12(720),
     HOUR_24(1440)
+}
+
+fun Int.toInterval(): Interval {
+    return Interval.entries.first { it.minutes == this }
 }

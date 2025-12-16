@@ -7,7 +7,9 @@ import com.dyusov.news.data.local.NewsDao
 import com.dyusov.news.data.local.NewsDatabase
 import com.dyusov.news.data.remote.NewsApiService
 import com.dyusov.news.data.repo.NewsRepositoryImpl
+import com.dyusov.news.data.repo.SettingsRepositoryImpl
 import com.dyusov.news.domain.repo.NewsRepository
+import com.dyusov.news.domain.repo.SettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -29,6 +31,10 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindNewsRepository(impl: NewsRepositoryImpl): NewsRepository
+
+    @Binds
+    @Singleton
+    fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 
     companion object {
 
