@@ -21,7 +21,8 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    // @param: -> apply annotation only to param
+    @param:ApplicationContext private val context: Context
 ) : SettingsRepository {
 
     // keys for DataStore
