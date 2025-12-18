@@ -28,14 +28,16 @@ app/
 └── presentation/  # Presentation layer (Compose UI, ViewModels)
 ```
 
-## Technical Stack
+## Tech Stack
 
-- **Kotlin 2.2.21**: Chosen for its null safety, concise syntax, and first-class coroutine support, enabling robust asynchronous programming
-- **Jetpack Compose 2025.12.00**: Selected for declarative UI development, providing modern Android UI patterns with better testability and performance over traditional View system
-- **Hilt 2.57.2**: Implemented for compile-time dependency injection, reducing boilerplate and ensuring proper object lifecycle management across the application
-- **Room 2.8.4**: Used for local data persistence with type-safe SQL queries, supporting offline caching and complex relationships between news articles and subscriptions
-- **Retrofit 3.0.0 with Kotlinx Serialization**: Employed for type-safe REST API communication, chosen for its annotation-based request configuration and seamless JSON parsing
-- **Kotlin Coroutines & Flow**: Utilized for reactive programming, enabling efficient background processing and real-time UI updates with proper error handling
+- **Programming Language**: Kotlin
+- **Architecture Pattern**: Clean Architecture with MVVM
+- **UI Framework**: Jetpack Compose (Material 3)
+- **Database**: Room (SQLite)
+- **Dependency Injection**: Hilt
+- **Async Programming**: Kotlin Coroutines and Flow
+- **Build Tool**: Gradle with Kotlin DSL
+- **Minimum Android SDK**: API 24 (Android 7.0)
 
 ## How to Build and Run
 
