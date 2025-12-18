@@ -7,11 +7,13 @@ A modern Android news aggregator built with Kotlin and Jetpack Compose, implemen
 
 ## Key Features
 
+- **Topic Subscription Management**: Subscribe/unsubscribe to news topics with real-time filtering
+- **Offline-First Architecture**: Room database caching with background WorkManager synchronization
+- **Modern Jetpack Compose UI**: Material 3 design with card layouts, search, and share functionality
 - **Reactive State Management**: ViewModel with StateFlow and sealed interfaces for type-safe UI commands
-- **Offline-First Architecture**: Room database with background synchronization for cached articles access
 - **Dependency Injection with Hilt**: Modular DI for testable code and repository pattern implementation
-- **Asynchronous Data Processing**: Kotlin Coroutines and Flow for reactive streams with error handling
-- **Material 3 UI Components**: Jetpack Compose with custom theming and responsive layouts
+- **Background Data Refresh**: Configurable refresh intervals and notification settings
+- **Image Loading & Caching**: Coil for efficient image loading with network caching support
 
 ## Architecture
 
@@ -30,12 +32,16 @@ app/
 
 ## Tech Stack
 
-- **Programming Language**: Kotlin
+- **Programming Language**: Kotlin 2.2.21
 - **Architecture Pattern**: Clean Architecture with MVVM
 - **UI Framework**: Jetpack Compose (Material 3)
 - **Database**: Room (SQLite)
 - **Dependency Injection**: Hilt
 - **Async Programming**: Kotlin Coroutines and Flow
+- **Networking**: Retrofit with Kotlinx Serialization
+- **Image Loading**: Coil
+- **Background Tasks**: Work Manager
+- **Preferences Storage**: DataStore
 - **Build Tool**: Gradle with Kotlin DSL
 - **Minimum Android SDK**: API 24 (Android 7.0)
 
