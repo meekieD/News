@@ -3,6 +3,7 @@ package com.dyusov.news.data.mapper
 import com.dyusov.news.data.local.ArticleDbModel
 import com.dyusov.news.data.remote.NewsResponseDto
 import com.dyusov.news.domain.entity.Article
+import com.dyusov.news.domain.entity.Language
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -31,6 +32,15 @@ fun List<ArticleDbModel>.toEntities(): List<Article> {
             url = it.url
         )
     }.distinct() // delete duplicates
+}
+
+fun Language.toQueryParam(): String {
+    return when(this) {
+        Language.ENGLISH -> "en"
+        Language.RUSSIAN -> "ru"
+        Language.FRENCH -> "fr"
+        Language.GERMAN -> "de"
+    }
 }
 
 private fun String.toTimestamp(): Long {

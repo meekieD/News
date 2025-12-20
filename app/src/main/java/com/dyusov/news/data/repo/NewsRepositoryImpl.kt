@@ -12,20 +12,20 @@ import com.dyusov.news.data.local.NewsDao
 import com.dyusov.news.data.local.SubscriptionDbModel
 import com.dyusov.news.data.mapper.toDbModels
 import com.dyusov.news.data.mapper.toEntities
+import com.dyusov.news.data.mapper.toQueryParam
 import com.dyusov.news.data.remote.NewsApiService
 import com.dyusov.news.domain.entity.Article
+import com.dyusov.news.domain.entity.Language
 import com.dyusov.news.domain.entity.RefreshConfig
 import com.dyusov.news.domain.repo.NewsRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class NewsRepositoryImpl @Inject constructor(
@@ -46,8 +46,8 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.addSubscription(SubscriptionDbModel(topic))
     }
 
-    override suspend fun updateArticlesForTopic(topic: String): Boolean {
-        val articles = loadArticles(topic)
+    override suspend fun updateArticlesForTopic(topic: String, language: Language): Boolean {
+        val articles = loadArticles(topic, language)
         val addedIds = newsDao.addArticles(articles)
         return addedIds.any { it != -1L } // if something was added return true
     }
@@ -56,7 +56,7 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.deleteSubscription(SubscriptionDbModel(topic))
     }
 
-    override suspend fun updateAllArticles(): List<String> {
+    override suspend fun updateAllArticles(language: Language): List<String> {
         // return current subscription collection from DB
         val subscriptions = newsDao.getAllSubscriptions().first()
 
@@ -65,7 +65,7 @@ class NewsRepositoryImpl @Inject constructor(
             subscriptions
                 .map { subscription ->
                     async {
-                        if (updateArticlesForTopic(subscription.topic)) {
+                        if (updateArticlesForTopic(subscription.topic, language)) {
                             subscription.topic
                         } else {
                             null
@@ -87,9 +87,9 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.deleteArticlesByTopics(topics)
     }
 
-    private suspend fun loadArticles(topic: String): List<ArticleDbModel> {
+    private suspend fun loadArticles(topic: String, language: Language): List<ArticleDbModel> {
         return try {
-            newsApiService.loadArticles(topic).toDbModels(topic)
+            newsApiService.loadArticles(topic, language.toQueryParam()).toDbModels(topic)
         } catch (e: Exception) {
             if (e is CancellationException) {
                 throw e

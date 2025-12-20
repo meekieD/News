@@ -1,6 +1,7 @@
 package com.dyusov.news.domain.repo
 
 import com.dyusov.news.domain.entity.Article
+import com.dyusov.news.domain.entity.Language
 import com.dyusov.news.domain.entity.RefreshConfig
 import kotlinx.coroutines.flow.Flow
 
@@ -10,11 +11,11 @@ interface NewsRepository {
 
     suspend fun addSubscription(topic: String)
 
-    suspend fun updateArticlesForTopic(topic: String): Boolean
+    suspend fun updateArticlesForTopic(topic: String, language: Language): Boolean
 
     suspend fun removeSubscription(topic: String)
 
-    suspend fun updateAllArticles(): List<String>
+    suspend fun updateAllArticles(language: Language): List<String>
 
     fun getArticlesByTopics(topics: List<String>): Flow<List<Article>>
 

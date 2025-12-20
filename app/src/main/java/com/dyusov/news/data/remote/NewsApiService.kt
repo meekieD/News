@@ -8,6 +8,8 @@ interface NewsApiService {
 
     @GET("v2/everything?apiKey=${BuildConfig.NEWS_API_KEY}") // endpoint
     suspend fun loadArticles(
-        @Query("q") topic: String // query param
+        // query params
+        @Query("q") topic: String,
+        @Query("language") language: String
     ): NewsResponseDto
 }
