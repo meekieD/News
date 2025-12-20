@@ -20,9 +20,11 @@ class RefreshDataWorker @AssistedInject constructor(
     // this method will be running in worker
     override suspend fun doWork(): Result {
         Log.d("RefreshDataWorker", "Start")
-        updateSubscribedArticlesUseCase()
+        val updatedTopics = updateSubscribedArticlesUseCase()
+        if (updatedTopics.isNotEmpty()) {
+            notificationHelper.showNewArticlesNotification(updatedTopics)
+        }
         Log.d("RefreshDataWorker", "Finish")
-        notificationHelper.showNewArticlesNotification(listOf()) // todo: temp
         return Result.success()
     }
 }

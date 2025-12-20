@@ -18,6 +18,9 @@ import com.dyusov.news.domain.entity.RefreshConfig
 import com.dyusov.news.domain.repo.NewsRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -43,26 +46,34 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.addSubscription(SubscriptionDbModel(topic))
     }
 
-    override suspend fun updateArticlesForTopic(topic: String) {
+    override suspend fun updateArticlesForTopic(topic: String): Boolean {
         val articles = loadArticles(topic)
-        newsDao.addArticles(articles)
+        val addedIds = newsDao.addArticles(articles)
+        return addedIds.any { it != -1L } // if something was added return true
     }
 
     override suspend fun removeSubscription(topic: String) {
         newsDao.deleteSubscription(SubscriptionDbModel(topic))
     }
 
-    override suspend fun updateAllArticles() {
+    override suspend fun updateAllArticles(): List<String> {
         // return current subscription collection from DB
         val subscriptions = newsDao.getAllSubscriptions().first()
 
-        // load articles for topic async - each one in different coroutine
-        coroutineScope {// parent coroutine
-            subscriptions.forEach {
-                launch {
-                    updateArticlesForTopic(it.topic)
+        // update articles for topic async - each in different coroutine - and return updated topics
+        return coroutineScope {
+            subscriptions
+                .map { subscription ->
+                    async {
+                        if (updateArticlesForTopic(subscription.topic)) {
+                            subscription.topic
+                        } else {
+                            null
+                        }
+                    }
                 }
-            }
+                .awaitAll()
+                .filterNotNull()
         }
     }
 
