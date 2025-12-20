@@ -2,10 +2,13 @@ package com.dyusov.news.data.background
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.dyusov.news.R
+import com.dyusov.news.presentation.MainActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -31,6 +34,20 @@ class NotificationHelper @Inject constructor(
     }
 
     fun showNewArticlesNotification(topics: List<String>) {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP // if MainActivity already in stack, open it
+        }
+
+        // Pending Intent to open app from notification
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            PENDING_INTENT_REQUEST_CODE,
+            intent,
+            // intent will be updated if called multiple times
+            // also FLAG_IMMUTABLE to set that intent cannot be changed
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_breaking_news)
             .setContentTitle(context.getString(R.string.new_articles_notification_title))
@@ -39,7 +56,10 @@ class NotificationHelper @Inject constructor(
                     R.string.updated_subscriptions,
                     topics.size,
                     topics.joinToString(", ")
-                ))
+                )
+            )
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true) // remove from notification center after click
             .build()
         notificationManager?.notify(NOTIFICATION_ID, notification)
     }
@@ -47,5 +67,6 @@ class NotificationHelper @Inject constructor(
     companion object {
         private const val CHANNEL_ID = "new_articles"
         private const val NOTIFICATION_ID = 1
+        private const val PENDING_INTENT_REQUEST_CODE = 1
     }
 }
