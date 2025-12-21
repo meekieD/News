@@ -66,27 +66,27 @@ fun SubscriptionsScreen(
     onNavigateToSettings: () -> Unit,
     viewModel: SubscriptionsViewModel = hiltViewModel()
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            SubscriptionsTopBar(
-                onClearArticlesClick = {
-                    viewModel.processCommand(SubscriptionsCommand.ClearArticles)
-                },
-                onSettingsClick = onNavigateToSettings
-            )
-        }
-    ) { innerPadding ->
-        // use delegate
-        val state by viewModel.state.collectAsState()
-        val refreshState by viewModel.refreshState.collectAsState()
+    // use delegate
+    val state by viewModel.state.collectAsState()
+    val refreshState by viewModel.refreshState.collectAsState()
 
-        PullToRefreshBox(
-            isRefreshing = refreshState,
-            onRefresh = {
-                viewModel.processCommand(SubscriptionsCommand.RefreshData)
+    PullToRefreshBox(
+        isRefreshing = refreshState,
+        onRefresh = {
+            viewModel.processCommand(SubscriptionsCommand.RefreshData)
+        }
+    ) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                SubscriptionsTopBar(
+                    onClearArticlesClick = {
+                        viewModel.processCommand(SubscriptionsCommand.ClearArticles)
+                    },
+                    onSettingsClick = onNavigateToSettings
+                )
             }
-        ) {
+        ) { innerPadding ->
             MainScreen(innerPadding, state, viewModel)
         }
     }
