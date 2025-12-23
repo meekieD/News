@@ -1,4 +1,4 @@
-package com.dyusov.news.presentation.screen.subsriptions
+package com.dyusov.news.presentation.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
