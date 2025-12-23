@@ -150,12 +150,14 @@ fun SettingsScreen(
                     },
                     thumbContent = {
                         if (state.settings.notificationsEnabled) {
+                            // icon when switch is checked
                             Icon(
                                 imageVector = Icons.Filled.Check,
                                 contentDescription = stringResource(R.string.switch_is_checked),
                                 modifier = Modifier.size(SwitchDefaults.IconSize)
                             )
                         } else {
+                            // icon when switch is not checked
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.switch_is_not_checked),
@@ -179,12 +181,14 @@ fun SettingsScreen(
                     },
                     thumbContent = {
                         if (state.settings.wifiOnly) {
+                            // icon when switch is checked
                             Icon(
                                 imageVector = Icons.Filled.Check,
                                 contentDescription = stringResource(R.string.switch_is_checked),
                                 modifier = Modifier.size(SwitchDefaults.IconSize)
                             )
                         } else {
+                            // icon when switch is not checked
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.switch_is_not_checked),
@@ -198,7 +202,6 @@ fun SettingsScreen(
         }
     }
 }
-
 
 @Composable
 fun SettingsCard(
@@ -215,38 +218,53 @@ fun SettingsCard(
         colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Column(
-                modifier = Modifier.widthIn(max = 172.dp)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 1.25.em
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = subtitle,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 1.25.em
-                )
-            }
+            SettingLabel(
+                modifier = Modifier.widthIn(max = 172.dp),
+                title = title,
+                subtitle = subtitle
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
             content()
         }
+    }
+}
+
+@Composable
+fun SettingLabel(
+    modifier: Modifier = Modifier,
+    title: String,
+    subtitle: String,
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            lineHeight = 1.25.em
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = subtitle,
+            fontSize = 12.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            lineHeight = 1.25.em,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -271,7 +289,7 @@ private fun <T> SettingsDropdown(
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true),
             value = itemAsString(selectedItem),
             onValueChange = {},
-            readOnly = true,
+            readOnly = true, // this text field is used only to show items
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             }
@@ -283,13 +301,11 @@ private fun <T> SettingsDropdown(
             items.forEach { item ->
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            text = itemAsString(item)
-                        )
+                        Text(itemAsString(item))
                     },
                     onClick = {
                         onItemSelected(item)
-                        expanded = false
+                        expanded = false // close list after choosing one item
                     }
                 )
             }
