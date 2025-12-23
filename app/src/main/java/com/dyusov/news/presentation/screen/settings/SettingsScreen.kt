@@ -54,8 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.dyusov.news.R
 import com.dyusov.news.data.mapper.toReadableContent
-import com.dyusov.news.domain.entity.Interval
-import com.dyusov.news.domain.entity.Language
 
 @Composable
 fun SettingsScreen(
@@ -107,7 +105,7 @@ fun SettingsScreen(
             ) {
                 SettingsDropdown(
                     modifier = modifier.widthIn(max = 160.dp),
-                    items = Language.entries,
+                    items = state.availableLanguages,
                     selectedItem = state.settings.language,
                     onItemSelected = {
                         viewModel.processCommand(SettingsCommand.UpdateLanguage(it))
@@ -124,7 +122,7 @@ fun SettingsScreen(
             ) {
                 SettingsDropdown(
                     modifier = modifier.widthIn(max = 160.dp),
-                    items = Interval.entries,
+                    items = state.availableIntervals,
                     selectedItem = state.settings.interval,
                     onItemSelected = {
                         viewModel.processCommand(SettingsCommand.UpdateInterval(it))
