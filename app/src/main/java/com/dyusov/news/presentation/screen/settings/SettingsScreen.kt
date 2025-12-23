@@ -101,105 +101,100 @@ fun SettingsScreen(
             modifier = Modifier.padding(paddingValues),
             verticalArrangement = Arrangement.Top
         ) {
-            when (val currentState = state) {
-                SettingsState.Initial -> {}
-                is SettingsState.SettingsConfig -> {
-                    SettingsCard(
-                        title = stringResource(R.string.news_language),
-                        subtitle = stringResource(R.string.choose_language_for_news_search)
-                    ) {
-                        SettingsDropdown(
-                            modifier = modifier.widthIn(max = 160.dp),
-                            items = Language.entries,
-                            selectedItem = currentState.settings.language,
-                            onItemSelected = {
-                                viewModel.processCommand(SettingsCommand.UpdateLanguage(it))
-                            },
-                            itemAsString = {
-                                it.toReadableContent()
-                            }
-                        )
+            SettingsCard(
+                title = stringResource(R.string.news_language),
+                subtitle = stringResource(R.string.choose_language_for_news_search)
+            ) {
+                SettingsDropdown(
+                    modifier = modifier.widthIn(max = 160.dp),
+                    items = Language.entries,
+                    selectedItem = state.settings.language,
+                    onItemSelected = {
+                        viewModel.processCommand(SettingsCommand.UpdateLanguage(it))
+                    },
+                    itemAsString = {
+                        it.toReadableContent()
                     }
+                )
+            }
 
-                    SettingsCard(
-                        title = stringResource(R.string.update_interval),
-                        subtitle = stringResource(R.string.how_often_to_update_news)
-                    ) {
-                        SettingsDropdown(
-                            modifier = modifier.widthIn(max = 160.dp),
-                            items = Interval.entries,
-                            selectedItem = currentState.settings.interval,
-                            onItemSelected = {
-                                viewModel.processCommand(SettingsCommand.UpdateInterval(it))
-                            },
-                            itemAsString = {
-                                it.toReadableContent()
-                            }
-                        )
+            SettingsCard(
+                title = stringResource(R.string.update_interval),
+                subtitle = stringResource(R.string.how_often_to_update_news)
+            ) {
+                SettingsDropdown(
+                    modifier = modifier.widthIn(max = 160.dp),
+                    items = Interval.entries,
+                    selectedItem = state.settings.interval,
+                    onItemSelected = {
+                        viewModel.processCommand(SettingsCommand.UpdateInterval(it))
+                    },
+                    itemAsString = {
+                        it.toReadableContent()
                     }
+                )
+            }
 
-                    SettingsCard(
-                        title = stringResource(R.string.notifications),
-                        subtitle = stringResource(R.string.show_notifications_about_articles)
-                    ) {
-                        Switch(
-                            checked = currentState.settings.notificationsEnabled,
-                            onCheckedChange = { enabled ->
-                                if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                                } else {
-                                    viewModel.processCommand(
-                                        SettingsCommand.ToggleNotificationsEnabled(enabled)
-                                    )
-                                }
-                            },
-                            thumbContent = {
-                                if (currentState.settings.notificationsEnabled) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = stringResource(R.string.switch_is_checked),
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = Icons.Filled.Close,
-                                        contentDescription = stringResource(R.string.switch_is_not_checked),
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                }
-                            }
-                        )
+            SettingsCard(
+                title = stringResource(R.string.notifications),
+                subtitle = stringResource(R.string.show_notifications_about_articles)
+            ) {
+                Switch(
+                    checked = state.settings.notificationsEnabled,
+                    onCheckedChange = { enabled ->
+                        if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            viewModel.processCommand(
+                                SettingsCommand.ToggleNotificationsEnabled(enabled)
+                            )
+                        }
+                    },
+                    thumbContent = {
+                        if (state.settings.notificationsEnabled) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = stringResource(R.string.switch_is_checked),
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = stringResource(R.string.switch_is_not_checked),
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        }
                     }
+                )
+            }
 
-                    SettingsCard(
-                        title = "Update only via Wi-Fi",
-                        subtitle = "Save mobile data"
-                    ) {
-                        Switch(
-                            checked = currentState.settings.wifiOnly,
-                            onCheckedChange = { enabled ->
-                                viewModel.processCommand(
-                                    SettingsCommand.ToggleWifiOnlyEnabled(enabled)
-                                )
-                            },
-                            thumbContent = {
-                                if (currentState.settings.wifiOnly) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = stringResource(R.string.switch_is_checked),
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = Icons.Filled.Close,
-                                        contentDescription = stringResource(R.string.switch_is_not_checked),
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                }
-                            }
+            SettingsCard(
+                title = "Update only via Wi-Fi",
+                subtitle = "Save mobile data"
+            ) {
+                Switch(
+                    checked = state.settings.wifiOnly,
+                    onCheckedChange = { enabled ->
+                        viewModel.processCommand(
+                            SettingsCommand.ToggleWifiOnlyEnabled(enabled)
                         )
+                    },
+                    thumbContent = {
+                        if (state.settings.wifiOnly) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = stringResource(R.string.switch_is_checked),
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = stringResource(R.string.switch_is_not_checked),
+                                modifier = Modifier.size(SwitchDefaults.IconSize)
+                            )
+                        }
                     }
-                }
+                )
             }
 
         }

@@ -28,7 +28,7 @@ class SettingsViewModel @Inject constructor(
     private val updateWifiOnlyUseCase: UpdateWifiOnlyUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<SettingsState>(SettingsState.Initial)
+    private val _state = MutableStateFlow(SettingsState())
 
     val state = _state.asStateFlow()
 
@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
         getSettingsUseCase()
             .onEach { settings ->
                 _state.update {
-                    SettingsState.SettingsConfig(settings = settings)
+                    SettingsState(settings = settings)
                 }
             }.launchIn(viewModelScope)
     }
@@ -77,9 +77,8 @@ sealed interface SettingsCommand {
 }
 
 // screen state
-sealed interface SettingsState {
-
-    data object Initial : SettingsState
-
-    data class SettingsConfig(val settings: Settings) : SettingsState
-}
+data class SettingsState(
+    val settings: Settings = Settings.default(),
+    val availableLanguages: List<Language> = Language.entries,
+    val availableIntervals: List<Interval> = Interval.entries
+)
