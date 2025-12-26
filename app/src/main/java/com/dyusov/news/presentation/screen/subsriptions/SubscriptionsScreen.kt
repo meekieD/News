@@ -390,7 +390,7 @@ private fun ArticleCard(
             overflow = TextOverflow.Ellipsis, // if overflow, print "..."
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
-            lineHeight = 1.5.em
+            lineHeight = 1.3.em
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -404,6 +404,7 @@ private fun ArticleCard(
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp,
                 lineHeight = 1.5.em
+                lineHeight = 1.3.em
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
