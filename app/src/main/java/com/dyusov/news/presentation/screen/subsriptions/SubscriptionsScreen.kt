@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -264,6 +265,10 @@ fun SearchBarWithAddButton(
         label = {
             Text(stringResource(R.string.what_interests_you))
         },
+        // action on keyboard "enter"
+        keyboardActions = KeyboardActions(
+            onDone = { onSubscribeButtonClick() }
+        ),
         singleLine = true,
         trailingIcon = {
             // add subscription icon with animation

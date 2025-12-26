@@ -100,11 +100,13 @@ class SubscriptionsViewModel @Inject constructor(
             }
 
             SubscriptionsCommand.Subscribe -> {
-                viewModelScope.launch {
-                    addSubscriptionUseCase(state.value.searchQuery.trim())
-                    // clear search field
-                    _state.update { currentState ->
-                        currentState.copy(searchQuery = "")
+                if (state.value.searchQuery.trim().isNotBlank()) {
+                    viewModelScope.launch {
+                        addSubscriptionUseCase(state.value.searchQuery.trim())
+                        // clear search field
+                        _state.update { currentState ->
+                            currentState.copy(searchQuery = "")
+                        }
                     }
                 }
             }
