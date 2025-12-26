@@ -3,6 +3,9 @@
 package com.dyusov.news.presentation.screen.subsriptions
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -247,6 +250,43 @@ private fun SubscriptionChip(
 }
 
 @Composable
+fun SearchBarWithAddButton(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    isSubscribeButtonEnabled: Boolean,
+    onSubscribeButtonClick: () -> Unit
+) {
+    OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        value = query,
+        onValueChange = onQueryChanged,
+        placeholder = {
+            Text(stringResource(R.string.what_interests_you))
+        },
+        singleLine = true,
+        trailingIcon = {
+            // add subscription icon with animation
+            AnimatedVisibility(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                visible = isSubscribeButtonEnabled,
+                enter = scaleIn(), // enter animation - scale in
+                exit = scaleOut()  // exit animation - scale out
+            ) {
+                Button(
+                    onClick = onSubscribeButtonClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_subscription)
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
 private fun Subscriptions(
     modifier: Modifier = Modifier,
     subscriptions: Map<String, Boolean>,
@@ -260,47 +300,17 @@ private fun Subscriptions(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        // search field with hint
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = query,
-            onValueChange = onQueryChanged,
-            label = {
-                Text(stringResource(R.string.what_interests_you))
-            },
-            singleLine = true
+        SearchBarWithAddButton(
+            query = query,
+            onQueryChanged = onQueryChanged,
+            isSubscribeButtonEnabled = isSubscribeButtonEnabled,
+            onSubscribeButtonClick = onSubscribeButtonClick
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // add subscription button
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onSubscribeButtonClick,
-            enabled = isSubscribeButtonEnabled
-        ) {
-            // add icon
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_subscription)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.add_subscription_button))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         // if there are subscriptions, show them below search field, else - text "No subscriptions"
         if (subscriptions.isNotEmpty()) {
-            // header
-            Text(
-                // show subscriptions + size
-                text = stringResource(R.string.subscriptions_label, subscriptions.size),
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             // row with FilterChip elements
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
