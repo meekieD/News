@@ -362,7 +362,7 @@ private fun ArticleCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         // load image if exists
         article.imageUrl?.let { imageUrl ->
@@ -382,6 +382,7 @@ private fun ArticleCard(
 
         // article header
         Text(
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp),
             text = article.title,
             maxLines = 2, // header size = 2 rows max
