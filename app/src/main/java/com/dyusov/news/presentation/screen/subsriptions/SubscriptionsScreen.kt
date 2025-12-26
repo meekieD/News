@@ -261,7 +261,7 @@ fun SearchBarWithAddButton(
         shape = RoundedCornerShape(12.dp),
         value = query,
         onValueChange = onQueryChanged,
-        placeholder = {
+        label = {
             Text(stringResource(R.string.what_interests_you))
         },
         singleLine = true,
