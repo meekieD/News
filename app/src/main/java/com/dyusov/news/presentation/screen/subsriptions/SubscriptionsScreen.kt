@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -264,6 +265,8 @@ fun SearchBarWithAddButton(
     isSubscribeButtonEnabled: Boolean,
     onSubscribeButtonClick: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+
     OutlinedTextField(
         textStyle = LocalTextStyle.current.copy(
             fontSize = 20.sp
@@ -280,7 +283,10 @@ fun SearchBarWithAddButton(
         },
         // action on keyboard "enter"
         keyboardActions = KeyboardActions(
-            onDone = { onSubscribeButtonClick() }
+            onDone = {
+                onSubscribeButtonClick()
+                focusManager.clearFocus() // hide keyboard
+            }
         ),
         singleLine = true,
         trailingIcon = {
