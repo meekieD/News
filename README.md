@@ -50,6 +50,20 @@ app/src/main/java/com/dyusov/news/
 - **Build Tool**: Gradle with Kotlin DSL
 - **Minimum Android SDK**: API 24 (Android 7.0)
 
+## Screenshots
+
+<p float="left">
+  <img src="/screenshots/photo_1.png" width="250" />
+  <img src="/screenshots/photo_2.png" width="250" />
+  <img src="/screenshots/photo_3.png" width="250" />
+</p>
+
+<p float="left">
+  <img src="/screenshots/photo_4.png" width="250" />
+  <img src="/screenshots/photo_5.png" width="250" />
+  <img src="/screenshots/photo_6.png" width="250" />
+</p>
+
 ## How to Build and Run
 
 ### Prerequisites
